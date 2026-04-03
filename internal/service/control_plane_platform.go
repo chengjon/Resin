@@ -32,6 +32,8 @@ type PlatformResponse struct {
 	ReverseProxyEmptyAccountBehavior string   `json:"reverse_proxy_empty_account_behavior"`
 	ReverseProxyFixedAccountHeader   string   `json:"reverse_proxy_fixed_account_header"`
 	AllocationPolicy                 string   `json:"allocation_policy"`
+	RequireEgressIP                  bool     `json:"require_egress_ip"`
+	RequireLatency                   bool     `json:"require_latency"`
 	UpdatedAt                        string   `json:"updated_at"`
 }
 
@@ -49,6 +51,8 @@ func platformToResponse(p model.Platform) PlatformResponse {
 		ReverseProxyEmptyAccountBehavior: behavior,
 		ReverseProxyFixedAccountHeader:   fixedHeader,
 		AllocationPolicy:                 p.AllocationPolicy,
+		RequireEgressIP:                  p.RequireEgressIP,
+		RequireLatency:                   p.RequireLatency,
 		UpdatedAt:                        time.Unix(0, p.UpdatedAtNs).UTC().Format(time.RFC3339Nano),
 	}
 }
@@ -74,6 +78,8 @@ type platformConfig struct {
 	ReverseProxyEmptyAccountBehavior string
 	ReverseProxyFixedAccountHeader   string
 	AllocationPolicy                 string
+	RequireEgressIP                  bool
+	RequireLatency                   bool
 }
 
 func normalizePlatformMissAction(raw string) string {
@@ -105,6 +111,8 @@ func (s *ControlPlaneService) defaultPlatformConfig(name string) platformConfig 
 			s.EnvCfg.DefaultPlatformReverseProxyFixedAccountHeader,
 		),
 		AllocationPolicy: s.EnvCfg.DefaultPlatformAllocationPolicy,
+		RequireEgressIP:  true,
+		RequireLatency:   true,
 	}
 }
 
@@ -118,6 +126,8 @@ func platformConfigFromModel(mp model.Platform) platformConfig {
 		ReverseProxyEmptyAccountBehavior: normalizePlatformEmptyAccountBehavior(mp.ReverseProxyEmptyAccountBehavior),
 		ReverseProxyFixedAccountHeader:   normalizeHeaderFieldName(mp.ReverseProxyFixedAccountHeader),
 		AllocationPolicy:                 mp.AllocationPolicy,
+		RequireEgressIP:                  mp.RequireEgressIP,
+		RequireLatency:                   mp.RequireLatency,
 	}
 }
 
@@ -132,6 +142,8 @@ func (cfg platformConfig) toModel(id string, updatedAtNs int64) model.Platform {
 		ReverseProxyEmptyAccountBehavior: cfg.ReverseProxyEmptyAccountBehavior,
 		ReverseProxyFixedAccountHeader:   cfg.ReverseProxyFixedAccountHeader,
 		AllocationPolicy:                 cfg.AllocationPolicy,
+		RequireEgressIP:                  cfg.RequireEgressIP,
+		RequireLatency:                   cfg.RequireLatency,
 		UpdatedAtNs:                      updatedAtNs,
 	}
 }
@@ -151,6 +163,8 @@ func (cfg platformConfig) toRuntime(id string) (*platform.Platform, error) {
 		cfg.ReverseProxyEmptyAccountBehavior,
 		cfg.ReverseProxyFixedAccountHeader,
 		cfg.AllocationPolicy,
+		cfg.RequireEgressIP,
+		cfg.RequireLatency,
 	), nil
 }
 
@@ -328,6 +342,8 @@ type CreatePlatformRequest struct {
 	ReverseProxyEmptyAccountBehavior *string  `json:"reverse_proxy_empty_account_behavior"`
 	ReverseProxyFixedAccountHeader   *string  `json:"reverse_proxy_fixed_account_header"`
 	AllocationPolicy                 *string  `json:"allocation_policy"`
+	RequireEgressIP                  *bool    `json:"require_egress_ip"`
+	RequireLatency                   *bool    `json:"require_latency"`
 }
 
 // CreatePlatform creates a new platform.
@@ -381,6 +397,12 @@ func (s *ControlPlaneService) CreatePlatform(req CreatePlatformRequest) (*Platfo
 		if err := setPlatformAllocationPolicy(&cfg, *req.AllocationPolicy); err != nil {
 			return nil, err
 		}
+	}
+	if req.RequireEgressIP != nil {
+		cfg.RequireEgressIP = *req.RequireEgressIP
+	}
+	if req.RequireLatency != nil {
+		cfg.RequireLatency = *req.RequireLatency
 	}
 	if err := validatePlatformConfig(&cfg, true); err != nil {
 		return nil, err
@@ -493,6 +515,16 @@ func (s *ControlPlaneService) UpdatePlatform(id string, patchJSON json.RawMessag
 		if err := setPlatformAllocationPolicy(&cfg, ap); err != nil {
 			return nil, err
 		}
+	}
+	if v, ok, err := patch.optionalBool("require_egress_ip"); err != nil {
+		return nil, err
+	} else if ok {
+		cfg.RequireEgressIP = v
+	}
+	if v, ok, err := patch.optionalBool("require_latency"); err != nil {
+		return nil, err
+	} else if ok {
+		cfg.RequireLatency = v
 	}
 	if err := validatePlatformConfig(&cfg, regionFiltersPatched); err != nil {
 		return nil, err

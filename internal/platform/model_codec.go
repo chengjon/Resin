@@ -48,6 +48,8 @@ func NewConfiguredPlatform(
 	emptyAccountBehavior string,
 	fixedAccountHeader string,
 	allocationPolicy string,
+	requireEgressIP bool,
+	requireLatency bool,
 ) *Platform {
 	normalizedFixedHeaders, fixedHeaders, err := NormalizeFixedAccountHeaders(fixedAccountHeader)
 	if err != nil {
@@ -61,6 +63,8 @@ func NewConfiguredPlatform(
 	plat.ReverseProxyFixedAccountHeader = normalizedFixedHeaders
 	plat.ReverseProxyFixedAccountHeaders = append([]string(nil), fixedHeaders...)
 	plat.AllocationPolicy = ParseAllocationPolicy(allocationPolicy)
+	plat.RequireEgressIP = requireEgressIP
+	plat.RequireLatency = requireLatency
 	return plat
 }
 
@@ -116,5 +120,7 @@ func BuildFromModel(mp model.Platform) (*Platform, error) {
 		emptyAccountBehavior,
 		fixedHeader,
 		mp.AllocationPolicy,
+		mp.RequireEgressIP,
+		mp.RequireLatency,
 	), nil
 }

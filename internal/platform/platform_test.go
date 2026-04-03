@@ -64,6 +64,7 @@ func TestPlatform_EvaluateNode_CircuitOpen(t *testing.T) {
 
 func TestPlatform_EvaluateNode_NoLatency(t *testing.T) {
 	p := NewPlatform("p1", "Test", nil, nil)
+	p.RequireLatency = true
 	h := makeHash(`{"type":"ss"}`)
 	// Create entry without latency table (maxLatencyTableEntries=0).
 	entry := node.NewNodeEntry(h, nil, time.Now(), 0)
@@ -98,6 +99,7 @@ func TestPlatform_EvaluateNode_NoOutbound(t *testing.T) {
 
 func TestPlatform_EvaluateNode_NoEgressIP(t *testing.T) {
 	p := NewPlatform("p1", "Test", nil, nil) // no region filters
+	p.RequireEgressIP = true
 	h := makeHash(`{"type":"ss"}`)
 	entry := makeFullyRoutableEntry(h, "sub1")
 	entry.SetEgressIP(netip.Addr{}) // egress unknown

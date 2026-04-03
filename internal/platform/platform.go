@@ -40,6 +40,8 @@ type Platform struct {
 	ReverseProxyFixedAccountHeader   string
 	ReverseProxyFixedAccountHeaders  []string
 	AllocationPolicy                 AllocationPolicy
+	RequireEgressIP                  bool
+	RequireLatency                   bool
 
 	// Routable view & its lock.
 	// viewMu serializes both FullRebuild and NotifyDirty.
@@ -129,10 +131,12 @@ func (p *Platform) evaluateNode(
 		return false
 	}
 
-	// 3. Egress IP must be known.
-	egressIP := entry.GetEgressIP()
-	if !egressIP.IsValid() {
-		return false
+	// 3. Egress IP must be known (when required).
+	if p.RequireEgressIP {
+		egressIP := entry.GetEgressIP()
+		if !egressIP.IsValid() {
+			return false
+		}
 	}
 
 	// 4. Region filter (when configured).
@@ -143,9 +147,11 @@ func (p *Platform) evaluateNode(
 		}
 	}
 
-	// 5. Has at least one latency record.
-	if !entry.HasLatency() {
-		return false
+	// 5. Has at least one latency record (when required).
+	if p.RequireLatency {
+		if !entry.HasLatency() {
+			return false
+		}
 	}
 
 	return true

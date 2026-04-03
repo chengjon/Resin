@@ -98,6 +98,8 @@ var platformPatchAllowedFields = map[string]bool{
 	"reverse_proxy_empty_account_behavior": true,
 	"reverse_proxy_fixed_account_header":   true,
 	"allocation_policy":                    true,
+	"require_egress_ip":                    true,
+	"require_latency":                      true,
 }
 
 var subscriptionPatchAllowedFields = map[string]bool{

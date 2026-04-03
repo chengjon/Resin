@@ -883,6 +883,8 @@ func TestDeletePlatform_DoesNotDecodeCorruptPersistedFiltersJSON(t *testing.T) {
 		string(platform.ReverseProxyEmptyAccountBehaviorAccountHeaderRule),
 		"",
 		platformRow.AllocationPolicy,
+		true,
+		true,
 	))
 
 	cp := &ControlPlaneService{
@@ -945,6 +947,8 @@ func TestResetPlatformToDefault_SupportsBuiltInDefaultPlatform(t *testing.T) {
 		string(platform.ReverseProxyEmptyAccountBehaviorAccountHeaderRule),
 		"",
 		defaultRow.AllocationPolicy,
+		true,
+		true,
 	))
 
 	cp := &ControlPlaneService{
@@ -1086,6 +1090,8 @@ func TestResetPlatformToDefault_DoesNotDecodeCorruptPersistedFiltersJSON(t *test
 		string(platform.ReverseProxyEmptyAccountBehaviorAccountHeaderRule),
 		"",
 		platformRow.AllocationPolicy,
+		true,
+		true,
 	))
 
 	cp := &ControlPlaneService{

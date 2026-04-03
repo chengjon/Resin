@@ -22,8 +22,10 @@ const (
 	stateVersionBaseSchema              = 1
 	stateVersionAddEmptyAccountBehavior = 2
 	stateVersionAddFixedAccountHeader   = 3
-	stateVersionNormalizeMissAction     = 4
-	stateLegacyBaselineVersion          = stateVersionAddFixedAccountHeader
+	stateVersionNormalizeMissAction      = 4
+	stateVersionAddRoutingRequirements   = 5
+	stateLatestVersion                   = stateVersionAddRoutingRequirements
+	stateLegacyBaselineVersion           = stateVersionAddFixedAccountHeader
 )
 
 //go:embed migrations/state/*.sql migrations/cache/*.sql

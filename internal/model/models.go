@@ -14,6 +14,8 @@ type Platform struct {
 	ReverseProxyEmptyAccountBehavior string `json:"reverse_proxy_empty_account_behavior"`
 	ReverseProxyFixedAccountHeader   string `json:"reverse_proxy_fixed_account_header"`
 	AllocationPolicy                 string `json:"allocation_policy"`
+	RequireEgressIP                  bool   `json:"require_egress_ip"`
+	RequireLatency                   bool   `json:"require_latency"`
 	UpdatedAtNs                      int64  `json:"updated_at_ns"`
 }
 

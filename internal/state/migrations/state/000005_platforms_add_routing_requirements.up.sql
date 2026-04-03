@@ -1,0 +1,2 @@
+ALTER TABLE platforms ADD COLUMN require_egress_ip INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE platforms ADD COLUMN require_latency INTEGER NOT NULL DEFAULT 1;
